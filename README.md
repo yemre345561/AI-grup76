@@ -4,8 +4,7 @@
 *CVil Society*
 
 ## Product Backlog
-👉 [Jira Sprint Board](https://ai-grup76-yzt.atlassian.net/jira/core/projects/RE/board?groupBy=status)
-
+👉 https://ai-grup76-yzt.atlassian.net/jira/core/projects/RE/board?groupBy=status
 ---
 
 ## Sprint Planlaması
