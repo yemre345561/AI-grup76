@@ -69,10 +69,10 @@
 
 ## Sprint Katılımcıları
 
-- Tuana Korkmazyürek  
-- Edanur Tekçe  
-- Yunus Emre Açıkoğlu  
-- Meriç Özcan  
+- Tuana Korkmazyürek - Aktif
+- Edanur Tekçe -  Aktif
+- Yunus Emre Açıkoğlu - Aktif
+- Meriç Özcan - Aktif
 
 ---
 
