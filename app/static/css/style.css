@@ -1,0 +1,180 @@
+/* Genel Stiller */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    background-color: #f8f9fa;
+}
+
+/* Navbar Özelleştirmeleri */
+.navbar {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+
+/* Kart Stilleri */
+.card {
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Buton Stilleri */
+.btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn-primary {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+.btn-primary:hover {
+    background-color: #2e59d9;
+    border-color: #2653d4;
+    transform: translateY(-1px);
+}
+
+/* Form Stilleri */
+.form-control, .form-select {
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    border: 1px solid #d1d3e2;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #bac8f3;
+    box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+}
+
+/* Dropzone Stili */
+#drop-area {
+    border: 2px dashed #d1d3e2;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+#drop-area.highlight {
+    border-color: #4e73df;
+    background-color: #f8f9ff;
+}
+
+/* Skor Göstergesi */
+.score-badge {
+    font-size: 1rem;
+    padding: 0.35rem 0.75rem;
+    border-radius: 50px;
+}
+
+/* Responsive Düzenlemeler */
+@media (max-width: 768px) {
+    .card {
+        margin-bottom: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
+
+/* Animasyonlar */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+/* Özel Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Tooltip Stilleri */
+.tooltip-inner {
+    max-width: 250px;
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Progress Bar Özelleştirmeleri */
+.progress {
+    height: 0.5rem;
+    border-radius: 10px;
+    background-color: #eaecf4;
+}
+
+.progress-bar {
+    border-radius: 10px;
+}
+
+/* Alert Özelleştirmeleri */
+.alert {
+    border: none;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+}
+
+/* Tablo Stilleri */
+.table {
+    --bs-table-bg: transparent;
+    --bs-table-striped-bg: #f8f9fc;
+    --bs-table-hover-bg: #f1f3f9;
+}
+
+.table > :not(caption) > * > * {
+    padding: 1rem 1.25rem;
+}
+
+/* Footer Stili */
+footer {
+    margin-top: 3rem;
+    padding: 2rem 0;
+    background-color: #f8f9fc;
+    border-top: 1px solid #e3e6f0;
+}
+
+/* Özel Checkbox ve Radio Butonları */
+.form-check-input:checked {
+    background-color: #4e73df;
+    border-color: #4e73df;
+}
+
+/* Responsive Görseller */
+.img-fluid {
+    max-width: 100%;
+    height: auto;
+}

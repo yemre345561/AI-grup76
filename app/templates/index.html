@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">CV Analiz Sistemi</h4>
+                </div>
+                <div class="card-body">
+                    <div id="upload-section" class="text-center p-4 border rounded">
+                        <h5 class="mb-4">CV'nizi Yükleyin</h5>
+                        <form id="uploadForm" enctype="multipart/form-data">
+                            <div class="custom-file mb-3">
+                                <input type="file" class="custom-file-input" id="cvFile" accept=".pdf,.doc,.docx" required>
+                                <label class="custom-file-label" for="cvFile">Dosya seçin (PDF veya DOCX)</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Analiz Et</button>
+                        </form>
+                    </div>
+                    
+                    <div id="progress-section" class="mt-4 d-none">
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <p id="status-message" class="text-center mt-2">Analiz başlatılıyor...</p>
+                    </div>
+                    
+                    <div id="results-section" class="mt-4 d-none">
+                        <h5 class="mb-3">Analiz Sonuçları</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title">Genel Puan</h6>
+                                        <div class="display-4" id="overall-score">-</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <h6 class="card-title">Öneriler</h6>
+                                        <ul id="recommendations" class="list-unstyled">
+                                            <li class="mb-2">Analiz sonuçları yükleniyor...</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+$(document).ready(function() {
+    $('#uploadForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData();
+        formData.append('file', $('#cvFile')[0].files[0]);
+        
+        // Show progress section
+        $('#upload-section').addClass('d-none');
+        $('#progress-section').removeClass('d-none');
+        $('#results-section').addClass('d-none');
+        
+        // Upload file
+        $.ajax({
+            url: '/api/cv/upload',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function(response) {
+                checkAnalysisStatus(response.cv_id);
+            },
+            error: function(xhr) {
+                showError('Dosya yüklenirken bir hata oluştu: ' + xhr.responseText);
+            }
+        });
+    });
+    
+    function checkAnalysisStatus(cvId) {
+        $.get(`/api/cv/${cvId}/status`, function(response) {
+            if (response.status === 'completed') {
+                showResults(cvId);
+            } else if (response.status === 'failed') {
+                showError('Analiz sırasında bir hata oluştu.');
+            } else {
+                // Update progress
+                const progress = response.progress || 0;
+                $('#progressBar').css('width', progress + '%').attr('aria-valuenow', progress);
+                $('#status-message').text(response.message || 'Analiz devam ediyor...');
+                
+                // Check again after delay
+                setTimeout(() => checkAnalysisStatus(cvId), 2000);
+            }
+        }).fail(function() {
+            showError('Durum kontrol edilirken bir hata oluştu.');
+        });
+    }
+    
+    function showResults(cvId) {
+        $.get(`/api/cv/${cvId}/analysis`, function(response) {
+            $('#progress-section').addClass('d-none');
+            $('#results-section').removeClass('d-none');
+            
+            // Update score
+            $('#overall-score').text(response.score || '0');
+            
+            // Update recommendations
+            const $recList = $('#recommendations').empty();
+            (response.recommendations || []).forEach(rec => {
+                $recList.append(`<li class="mb-2">
+                    <i class="fas fa-arrow-right text-primary mr-2"></i>
+                    ${rec.message}
+                </li>`);
+            });
+            
+        }).fail(function() {
+            showError('Sonuçlar yüklenirken bir hata oluştu.');
+        });
+    }
+    
+    function showError(message) {
+        $('#progress-section').addClass('d-none');
+        $('#upload-section').removeClass('d-none');
+        alert(message);
+    }
+    
+    // Update file input label
+    $('.custom-file-input').on('change', function() {
+        let fileName = $(this).val().split('\\').pop();
+        $(this).next('.custom-file-label').addClass('selected').html(fileName);
+    });
+});
+</script>
+{% endblock %}

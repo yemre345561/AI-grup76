@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <h1 class="fw-bold mb-3">CV Yükle</h1>
+                <p class="lead text-muted">CV'nizi yükleyin, anında analiz edelim.</p>
+            </div>
+            
+            {% if not current_user.is_authenticated %}
+                <div class="alert alert-warning">
+                    CV yüklemek için lütfen <a href="{{ url_for('auth.login') }}">giriş yapın</a> veya <a href="{{ url_for('auth.signup') }}">kayıt olun</a>.
+                </div>
+            {% else %}
+                <div class="card shadow-sm border-0 p-4">
+                    <div class="card-body">
+                        <div class="text-center mb-4">
+                            <p class="lead">Lütfen CV'nizi yükleyin (PDF, DOC veya DOCX formatında)</p>
+                        </div>
+
+                        <!-- Basit Form -->
+                        <form method="POST" action="{{ url_for('views.upload_cv') }}" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="cv-file" class="form-label">CV Dosyası Seçin</label>
+                                <input class="form-control" type="file" id="cv-file" name="file" accept=".pdf,.doc,.docx" required>
+                                <div class="form-text">Maksimum dosya boyutu: 5MB</div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-upload me-2"></i>Yükle
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- Hata mesajları için alan -->
+                        {% with messages = get_flashed_messages(with_categories=true) %}
+                            {% if messages %}
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} mt-3">
+                                        {{ message }}
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        {% endwith %}
+                    </div>
+
+                    <div class="card-footer">
+                        <a href="{{ url_for('views.my_cvs') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

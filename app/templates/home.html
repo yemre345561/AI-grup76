@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section py-5 bg-gradient-primary text-white">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h1 class="display-4 fw-bold mb-4">CV Analiz Platformu</h1>
+                <p class="lead mb-4">CV'nizi yükleyin, anında puanlansın ve iyileştirme önerileri alın!</p>
+                
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('views.upload_cv') }}" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-upload me-2"></i>Yeni CV Yükle
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('auth.sign_up') }}" class="btn btn-light btn-lg px-5">
+                        <i class="fas fa-rocket me-2"></i>Hemen Başla
+                    </a>
+                    <p class="small mt-3">Zaten üye misiniz? <a href="{{ url_for('auth.login') }}" class="text-white fw-bold">Giriş Yapın</a></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4">
+                <div class="text-primary mb-3">
+                    <i class="fas fa-bolt fa-2x"></i>
+                </div>
+                <h4>Hızlı Analiz</h4>
+                <p class="text-muted">CV'nizi yükleyin, saniyeler içinde detaylı analiz raporunuzu alın.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4">
+                <div class="text-primary mb-3">
+                    <i class="fas fa-star fa-2x"></i>
+                </div>
+                <h4>100 Puan Üzerinden</h4>
+                <p class="text-muted">CV'niz detaylı bir şekilde değerlendirilir.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm p-4">
+                <div class="text-primary mb-3">
+                    <i class="fas fa-lightbulb fa-2x"></i>
+                </div>
+                <h4>Özel Öneriler</h4>
+                <p class="text-muted">Güçlü ve zayıf yönlerinizi keşfedin.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Call to Action -->
+{% if not current_user.is_authenticated %}
+<div class="container mb-5">
+    <div class="bg-primary text-white rounded-3 p-5 text-center">
+        <h2 class="fw-bold mb-3">Hemen Ücretsiz Başlayın</h2>
+        <p class="lead mb-4">Kariyeriniz için ilk adımı atın, CV'nizi profesyonelce analiz edelim.</p>
+        <a href="{{ url_for('auth.sign_up') }}" class="btn btn-light btn-lg px-5">
+            <i class="fas fa-rocket me-2"></i>Hemen Üye Ol
+        </a>
+    </div>
+</div>
+{% endif %}
+
+<style>
+.hero-section {
+    background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+    padding: 5rem 0;
+    margin-bottom: 3rem;
+}
+
+.card {
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-radius: 10px;
+    height: 100%;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+}
+
+.btn {
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+}
+
+.btn-primary {
+    background: #4e73df;
+    border: none;
+    padding: 0.75rem 2.5rem;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: #3a5ccc;
+    box-shadow: 0 5px 15px rgba(78, 115, 223, 0.3);
+}
+
+.btn-light {
+    background: white;
+    color: #4e73df;
+    font-weight: 600;
+    padding: 0.75rem 2.5rem;
+}
+
+.btn-light:hover {
+    background: #f8f9fa;
+    color: #3a5ccc;
+}
+</style>
+{% endblock %}

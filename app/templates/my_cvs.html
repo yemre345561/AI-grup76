@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>CV'lerim</h1>
+    <a href="{{ url_for('views.upload_cv') }}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>Yeni CV Yükle
+    </a>
+</div>
+
+{% if cvs %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Dosya Adı</th>
+                    <th>Yükleme Tarihi</th>
+                    <th>Durum</th>
+                    <th>Puan</th>
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cv in cvs %}
+                <tr>
+                    <td>
+                        <i class="fas fa-file-{{ 'pdf' if cv.original_filename.endswith('.pdf') else 'word' }} text-primary me-2"></i>
+                        {{ cv.original_filename }}
+                    </td>
+                    <td>{{ cv.upload_date.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <span class="badge bg-{{ 'success' if cv.analysis_result else 'secondary' }}">
+                            {{ 'Tamamlandı' if cv.analysis_result else 'Bekliyor' }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if cv.score is defined and cv.score is not none %}
+                        <div class="d-flex align-items-center">
+                            {% set score_percent = (cv.score * 100)|round|int %}
+                            {% if cv.score >= 0.7 %}
+                                {% set bar_class = 'bg-success' %}
+                            {% elif cv.score >= 0.5 %}
+                                {% set bar_class = 'bg-warning' %}
+                            {% else %}
+                                {% set bar_class = 'bg-danger' %}
+                            {% endif %}
+                            <div class="progress flex-grow-1 me-2" style="height:6px">
+                                <div class="progress-bar {{ bar_class }}" 
+                                     data-width="{{ score_percent }}"
+                                     role="progressbar">
+                                </div>
+                            </div>
+                            <script>
+                                // Progress bar genişliğini ayarla
+                                document.addEventListener('DOMContentLoaded', function() {
+                                    const progressBars = document.querySelectorAll('[data-width]');
+                                    progressBars.forEach(bar => {
+                                        bar.style.width = bar.dataset.width + '%';
+                                    });
+                                });
+                            </script>
+                            <span class="fw-bold">{{ score_percent }}%</span>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if cv.analysis_result %}
+                        <a href="{{ url_for('views.cv_results', cv_id=cv.id) }}" class="btn btn-sm btn-outline-primary me-1" title="Görüntüle">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        {% endif %}
+                        <button class="btn btn-sm btn-outline-danger" title="Sil" data-bs-toggle="modal" data-bs-target="#deleteModal{{ cv.id }}">
+                            <i class="fas fa-trash-alt"></i>
+                        </button>
+                        
+                        <!-- Silme Onay Modal -->
+                        <div class="modal fade" id="deleteModal{{ cv.id }}" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">CV'yi Sil</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>"{{ cv.original_filename }}" adlı CV'yi silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">İptal</button>
+                                        <form action="{{ url_for('views.delete_cv', cv_id=cv.id) }}" method="POST" class="d-inline">
+                                            <button type="submit" class="btn btn-danger">Sil</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <div class="text-center py-5 bg-light rounded-3">
+        <i class="fas fa-file-upload fa-4x text-muted mb-3"></i>
+        <h3>Henüz hiç CV yüklemediniz</h3>
+        <p class="text-muted mb-4">İlk CV'nizi yükleyerek analiz sonuçlarınızı görebilirsiniz.</p>
+        <a href="{{ url_for('views.upload_cv') }}" class="btn btn-primary">
+            <i class="fas fa-upload me-2"></i>CV Yükle
+        </a>
+    </div>
+{% endif %}
+
+{% endblock %}

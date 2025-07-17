@@ -1,0 +1,260 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 overflow-hidden">
+                <!-- Profile Header -->
+                <div class="profile-header text-center py-4" style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);">
+                    <div class="profile-img mx-auto mb-3" style="width: 120px; height: 120px; border-radius: 50%; background: #fff; padding: 5px; box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);">
+                        <div class="d-flex align-items-center justify-content-center h-100" style="border-radius: 50%; background: #f8f9fc; font-size: 3rem; color: #4e73df;">
+                            {{ user.first_name[0]|upper }}{{ user.last_name[0]|upper if user.last_name else '' }}
+                        </div>
+                    </div>
+                    <h3 class="text-white mb-1">{{ user.first_name }} {{ user.last_name if user.last_name else '' }}</h3>
+                    <p class="text-white-50 mb-0">{{ user.email }}</p>
+                    <div class="mt-2">
+                        <span class="badge bg-light text-primary">Üye Olma Tarihi: {{ user.date_created.strftime('%d.%m.%Y') }}</span>
+                    </div>
+                </div>
+                
+                <div class="card-body p-0">
+                    {% with messages = get_flashed_messages(with_categories=true) %}
+                        {% if messages %}
+                            <div class="container mt-4">
+                                {% for category, message in messages %}
+                                    <div class="alert alert-{{ category }} alert-dismissible fade show">
+                                        <i class="fas {% if category == 'success' %}fa-check-circle{% else %}fa-exclamation-circle{% endif %} me-2"></i>
+                                        {{ message }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    
+                    <div class="container py-4">
+
+                    <form method="POST" action="{{ url_for('views.profile') }}">
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0"><i class="fas fa-user-edit me-2 text-primary"></i>Kişisel Bilgiler</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="first_name" class="form-label">Ad</label>
+                                        <input type="text" class="form-control" id="first_name" name="first_name" 
+                                               value="{{ user.first_name }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label for="last_name" class="form-label">Soyad</label>
+                                        <input type="text" class="form-control" id="last_name" name="last_name" 
+                                               value="{{ user.last_name if user.last_name else '' }}">
+                                    </div>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">E-posta Adresi</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                                        <input type="email" class="form-control" id="email" name="email" 
+                                               value="{{ user.email }}" required>
+                                    </div>
+                                </div>
+                                <div class="mb-0">
+                                    <label class="form-label">Üyelik Tarihi</label>
+                                    <p class="text-muted mb-0">
+                                        <i class="far fa-calendar-alt me-2"></i>
+                                        {{ user.date_created.strftime('%d %B %Y') }} tarihinden beri üyesiniz.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4 border-0 shadow-sm">
+                            <div class="card-header bg-light py-3">
+                                <h5 class="mb-0"><i class="fas fa-lock me-2 text-primary"></i>Güvenlik Ayarları</h5>
+                            </div>
+                            <div class="card-body">
+                                <p class="text-muted small mb-4">Şifrenizi güvenli tutun ve düzenli olarak güncelleyin.</p>
+                                
+                                <div class="mb-3">
+                                    <label for="current_password" class="form-label">Mevcut Şifre</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text"><i class="fas fa-key"></i></span>
+                                        <input type="password" class="form-control" id="current_password" 
+                                               name="current_password" placeholder="Mevcut şifrenizi girin" autocomplete="current-password">
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label for="new_password" class="form-label">Yeni Şifre</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                                            <input type="password" class="form-control" id="new_password" 
+                                                   name="new_password" placeholder="En az 6 karakter" autocomplete="new-password">
+                                        </div>
+                                        <div class="form-text">En az 6 karakter uzunluğunda olmalıdır.</div>
+                                    </div>
+                                    
+                                    <div class="col-md-6 mb-3">
+                                        <label for="confirm_password" class="form-label">Yeni Şifre (Tekrar)</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text"><i class="fas fa-redo"></i></span>
+                                            <input type="password" class="form-control" id="confirm_password" 
+                                                   name="confirm_password" placeholder="Yeni şifrenizi tekrar girin" autocomplete="new-password">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="password-strength mt-3">
+                                    <div class="progress" style="height: 5px;">
+                                        <div id="password-strength-bar" class="progress-bar bg-danger" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                    <small id="password-strength-text" class="form-text text-muted"></small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="{{ url_for('views.my_cvs') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Geri Dön
+                            </a>
+                            <div>
+                                <button type="button" class="btn btn-outline-danger me-2" data-bs-toggle="modal" data-bs-target="#deleteAccountModal">
+                                    <i class="fas fa-trash-alt me-2"></i>Hesabı Sil
+                                </button>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="fas fa-save me-2"></i>Değişiklikleri Kaydet
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Delete Account Modal -->
+                        <div class="modal fade" id="deleteAccountModal" tabindex="-1" aria-labelledby="deleteAccountModalLabel" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header bg-danger text-white">
+                                        <h5 class="modal-title" id="deleteAccountModalLabel">
+                                            <i class="fas fa-exclamation-triangle me-2"></i>Hesap Silme Onayı
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="text-center mb-4">
+                                            <div class="bg-danger bg-opacity-10 p-3 rounded-circle d-inline-block mb-3">
+                                                <i class="fas fa-exclamation-circle text-danger" style="font-size: 3rem;"></i>
+                                            </div>
+                                            <h4 class="text-danger mb-3">Hesabınızı Silmek İstediğinize Emin misiniz?</h4>
+                                            <p class="text-muted">Bu işlem geri alınamaz! Tüm kişisel verileriniz, CV'leriniz ve hesap bilgileriniz kalıcı olarak silinecektir.</p>
+                                        </div>
+                                        <div class="alert alert-warning">
+                                            <div class="d-flex">
+                                                <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
+                                                <div>
+                                                    <strong>Dikkat:</strong> Bu işlem geri alınamaz. Hesabınızı sildikten sonra tüm verileriniz kalıcı olarak kaybolacaktır.
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                                            <i class="fas fa-times me-2"></i>İptal
+                                        </button>
+                                        <button type="button" class="btn btn-danger" id="confirmDeleteBtn">
+                                            <i class="fas fa-trash-alt me-2"></i>Hesabımı Sil
+                                        </button>
+                                        <script>
+                                        document.getElementById('confirmDeleteBtn').addEventListener('click', function() {
+                                            if(confirm('Hesabınızı silmek istediğinize emin misiniz? Bu işlem geri alınamaz!')) {
+                                                fetch('{{ url_for("views.delete_account") }}', {
+                                                    method: 'POST',
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'X-CSRFToken': '{{ csrf_token() }}'
+                                                    },
+                                                    credentials: 'same-origin'
+                                                })
+                                                .then(response => response.json())
+                                                .then(data => {
+                                                    if(data.success) {
+                                                        window.location.href = '{{ url_for("views.home") }}';
+                                                    } else {
+                                                        alert('Hata: ' + (data.message || 'Bilinmeyen hata oluştu'));
+                                                    }
+                                                })
+                                                .catch(error => {
+                                                    console.error('Error:', error);
+                                                    alert('İşlem sırasında bir hata oluştu. Lütfen konsolu kontrol edin.');
+                                                });
+                                            }
+                                        });
+                                        </script>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Password Strength Meter -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const passwordInput = document.getElementById('new_password');
+    const strengthBar = document.getElementById('password-strength-bar');
+    const strengthText = document.getElementById('password-strength-text');
+    
+    if (passwordInput && strengthBar && strengthText) {
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            let text = '';
+            let barColor = 'bg-danger';
+            
+            // Check password strength
+            if (password.length >= 8) strength += 1;
+            if (password.match(/[a-z]+/)) strength += 1;
+            if (password.match(/[A-Z]+/)) strength += 1;
+            if (password.match(/[0-9]+/)) strength += 1;
+            if (password.match(/[!@#$%^&*(),.?":{}|<>]+/)) strength += 1;
+            
+            // Update UI
+            const width = (strength / 5) * 100;
+            strengthBar.style.width = width + '%';
+            
+            // Set text and color based on strength
+            if (password.length === 0) {
+                text = 'Şifre gücü';
+                barColor = 'bg-secondary';
+            } else if (strength <= 1) {
+                text = 'Çok zayıf';
+                barColor = 'bg-danger';
+            } else if (strength <= 2) {
+                text = 'Zayıf';
+                barColor = 'bg-warning';
+            } else if (strength <= 3) {
+                text = 'Orta';
+                barColor = 'bg-info';
+            } else if (strength <= 4) {
+                text = 'Güçlü';
+                barColor = 'bg-primary';
+            } else {
+                text = 'Çok güçlü';
+                barColor = 'bg-success';
+            }
+            
+            // Update elements
+            strengthBar.className = 'progress-bar ' + barColor;
+            strengthText.textContent = text;
+        });
+    }
+});
+</script>
+{% endblock %}

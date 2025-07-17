@@ -1,0 +1,16 @@
+Flask==2.3.3
+Flask-SQLAlchemy==3.0.5
+Flask-Login==0.6.2
+Werkzeug==2.3.7
+flask-sqlalchemy>=2.5.1
+flask-login>=0.5.0
+flask-wtf>=1.0.0
+python-dotenv>=0.19.0
+PyPDF2>=2.0.0
+python-docx>=0.8.11
+requests>=2.26.0
+celery>=5.2.0
+python-dateutil>=2.8.2
+sqlalchemy>=1.4.0
+kombu>=5.2.0  # Celery için gerekli
+python-multipart>=0.0.5  # File uploadlar için

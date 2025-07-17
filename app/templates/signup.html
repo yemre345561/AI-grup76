@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+        <div class="card shadow">
+            <div class="card-body p-5">
+                <h2 class="card-title text-center mb-4">Kayıt Ol</h2>
+                <form method="POST" action="{{ url_for('auth.sign_up') }}">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label">Adınız</label>
+                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label">Soyadınız</label>
+                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Adresi</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password1" class="form-label">Şifre</label>
+                        <input type="password" class="form-control" id="password1" name="password1" required>
+                        <div class="form-text">Şifreniz en az 7 karakter uzunluğunda olmalıdır.</div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="password2" class="form-label">Şifre (Tekrar)</label>
+                        <input type="password" class="form-control" id="password2" name="password2" required>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Kayıt Ol</button>
+                    </div>
+                </form>
+                <hr class="my-4">
+                <p class="text-center mb-0">Zaten hesabınız var mı? <a href="{{ url_for('auth.login') }}">Giriş Yapın</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
