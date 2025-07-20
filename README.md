@@ -128,7 +128,7 @@ Gelecek geliştirmeler planlandı. Planlanan geliştirmeler aşağıda madde mad
 
 ## Sprint Retrospective
 İyi Olanlar:
-Uygun ve kaliteli veri setleri zamanında bulundu.
+*Uygun ve kaliteli veri setleri zamanında bulundu.*
 Model geliştirme sürecine planlandığı gibi başlandı.
 Web uygulaması için arayüz kodlamasına başlanarak ön yüz tasarımı yapıldı.
 Ekip içi iletişim ve görev paylaşımı uyumlu şekilde ilerledi.
