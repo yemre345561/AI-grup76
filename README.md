@@ -86,3 +86,5 @@
 - Final haftası ve staj başlangıcı nedeniyle kod geliştirme kısmı yetersiz kaldı.  
 - Arayüz tasarımı konusunda görüş farklılıkları zaman kaybettirdi.  
 - Zaman yönetimi için bir sonraki sprintte daha net görev dağılımı yapılacak.
+
+# Sprint 2 Raporu
