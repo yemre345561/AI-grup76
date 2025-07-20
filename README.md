@@ -106,8 +106,8 @@ Aşağıdaki linkte uygulamanın arayüz görüntülerine ve geliştirilen model
 https://drive.google.com/drive/folders/1ISEpIOwXcuzbl3RS_DKlopBywuVwm0Eg?usp=sharing
 
 ## Sprint Review
--Proje için kullanılacak uygun veri setleri araştırıldı ve seçildi.
--Seçilen veri setleri başarıyla toplandı ve ön işleme (temizleme ve dönüştürme) süreci başlatıldı.
+- Proje için kullanılacak uygun veri setleri araştırıldı ve seçildi.
+- Seçilen veri setleri başarıyla toplandı ve ön işleme (temizleme ve dönüştürme) süreci başlatıldı.
 -Model denemeleri yapılarak algoritma test edildi.
 -Web uygulaması için arayüz tasarımı yapıldı.
 -Backend ve frontend arasındaki temel bağlantı yapısı planlandı.
