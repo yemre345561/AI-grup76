@@ -113,12 +113,12 @@ https://drive.google.com/drive/folders/1ISEpIOwXcuzbl3RS_DKlopBywuVwm0Eg?usp=sha
 - Backend ve frontend arasındaki temel bağlantı yapısı planlandı.
 - Takım içi görev dağılımı netleştirildi ve günlük ilerleme takibi yapıldı.
 - Gelecek geliştirmeler planlandı. Planlanan geliştirmeler aşağıda madde madde yer almaktadır
-- •	Flask/FastAPI Web API entegrasyonu:
-- •	CV yüklenip JSON raporu alınabilecek web servisi.
-- •	İmla ve dil bilgisi kontrolü (Java 17 ile LanguageTool).
-- •	Derin öğrenme tabanlı bölüm ayıklama (BERT fine-tune).
-- •	Web arayüzü (React + backend API).
-- •	Puanlama optimizasyonu için ML modeli (örneğin iyi CV örnekleriyle eğitilmiş bir regresyon veya sınıflandırma modeli).
+- 1. Flask/FastAPI Web API entegrasyonu
+- 2. CV yüklenip JSON raporu alınabilecek web servisi.
+- 3. İmla ve dil bilgisi kontrolü (Java 17 ile LanguageTool).
+- 4. Derin öğrenme tabanlı bölüm ayıklama (BERT fine-tune).
+- 5. Web arayüzü (React + backend API).
+- 6. Puanlama optimizasyonu için ML modeli (örneğin iyi CV örnekleriyle eğitilmiş bir regresyon veya sınıflandırma modeli).
 
 ## Sprint Katılımcıları
 - Edanur Tekçe(Aktif)
