@@ -106,19 +106,19 @@ Aşağıdaki linkte uygulamanın arayüz görüntülerine ve geliştirilen model
 https://drive.google.com/drive/folders/1ISEpIOwXcuzbl3RS_DKlopBywuVwm0Eg?usp=sharing
 
 ## Sprint Review
-Proje için kullanılacak uygun veri setleri araştırıldı ve seçildi.
-Seçilen veri setleri başarıyla toplandı ve ön işleme (temizleme ve dönüştürme) süreci başlatıldı.
-Model denemeleri yapılarak algoritma test edildi.
-Web uygulaması için arayüz tasarımı yapıldı.
-Backend ve frontend arasındaki temel bağlantı yapısı planlandı.
-Takım içi görev dağılımı netleştirildi ve günlük ilerleme takibi yapıldı.
-Gelecek geliştirmeler planlandı. Planlanan geliştirmeler aşağıda madde madde yer almaktadır
-•	Flask/FastAPI Web API entegrasyonu:
-•	CV yüklenip JSON raporu alınabilecek web servisi.
-•	İmla ve dil bilgisi kontrolü (Java 17 ile LanguageTool).
-•	Derin öğrenme tabanlı bölüm ayıklama (BERT fine-tune).
-•	Web arayüzü (React + backend API).
-•	Puanlama optimizasyonu için ML modeli (örneğin iyi CV örnekleriyle eğitilmiş bir regresyon veya sınıflandırma modeli).
+-Proje için kullanılacak uygun veri setleri araştırıldı ve seçildi.
+-Seçilen veri setleri başarıyla toplandı ve ön işleme (temizleme ve dönüştürme) süreci başlatıldı.
+-Model denemeleri yapılarak algoritma test edildi.
+-Web uygulaması için arayüz tasarımı yapıldı.
+-Backend ve frontend arasındaki temel bağlantı yapısı planlandı.
+-Takım içi görev dağılımı netleştirildi ve günlük ilerleme takibi yapıldı.
+-Gelecek geliştirmeler planlandı. Planlanan geliştirmeler aşağıda madde madde yer almaktadır
+-•	Flask/FastAPI Web API entegrasyonu:
+-•	CV yüklenip JSON raporu alınabilecek web servisi.
+-•	İmla ve dil bilgisi kontrolü (Java 17 ile LanguageTool).
+-•	Derin öğrenme tabanlı bölüm ayıklama (BERT fine-tune).
+-•	Web arayüzü (React + backend API).
+-•	Puanlama optimizasyonu için ML modeli (örneğin iyi CV örnekleriyle eğitilmiş bir regresyon veya sınıflandırma modeli).
 
 ## Sprint Katılımcıları
 - Edanur Tekçe(Aktif)
@@ -127,13 +127,13 @@ Gelecek geliştirmeler planlandı. Planlanan geliştirmeler aşağıda madde mad
 - Yunus Emre Açıkoğlu(Aktif)
 
 ## Sprint Retrospective
-İyi Olanlar:
-*Uygun ve kaliteli veri setleri zamanında bulundu.*
-Model geliştirme sürecine planlandığı gibi başlandı.
-Web uygulaması için arayüz kodlamasına başlanarak ön yüz tasarımı yapıldı.
-Ekip içi iletişim ve görev paylaşımı uyumlu şekilde ilerledi.
-Geliştirilmesi Gerekenler:
-Model eğitimi sırasında yaşanan bazı teknik sorunlar çözüm sürecini yavaşlattı.
-Geliştirilen modüllerin entegrasyonu için daha erken testler yapılmalı.
-Dokümantasyonun güncel tutulması konusunda daha dikkatli olunmalı.
+## İyi Olanlar:
+-Uygun ve kaliteli veri setleri zamanında bulundu.
+-Model geliştirme sürecine planlandığı gibi başlandı.
+-Web uygulaması için arayüz kodlamasına başlanarak ön yüz tasarımı yapıldı.
+-Ekip içi iletişim ve görev paylaşımı uyumlu şekilde ilerledi.
+## Geliştirilmesi Gerekenler:
+-Model eğitimi sırasında yaşanan bazı teknik sorunlar çözüm sürecini yavaşlattı.
+-Geliştirilen modüllerin entegrasyonu için daha erken testler yapılmalı.
+-Dokümantasyonun güncel tutulması konusunda daha dikkatli olunmalı.
 
