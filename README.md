@@ -90,10 +90,10 @@
 # Sprint 2 Raporu
 
 ## Sprint Notları
-Karar verilen proje için uygun veri setleri bulundu. Toplanılan verilerle model geliştirilmeye başlandı. Web uygulamasının arayüz kodları yazılmaya başlandı. 
+Karar verilen proje için uygun veri setleri bulundu.Toplanılan verilerle model geliştirilmeye başlandı.Web uygulamasının arayüz kodları yazılmaya başlandı. 
 
 ## Tahmin Edilen Tamamlanacak Puan
-Toplam proje iş yükü 100 puan olarak planlanmıştır. İkinci sprintte veri setlerinin toplanması model geliştirmeye başlanması ve web uygulamasının arayüz tasarımının oluşturulması hedeflenmiştir. Bu işler toplam projenin yaklaşık %35’unu kapsadığından bu sprintte tamamlanması hedeflenen puan 35 olarak belirlenmiştir.
+Toplam proje iş yükü 100 puan olarak planlanmıştır.İkinci sprintte veri setlerinin toplanması model geliştirmeye başlanması ve web uygulamasının arayüz tasarımının oluşturulması hedeflenmiştir.Bu işler toplam projenin yaklaşık %35’ini kapsadığından bu sprintte tamamlanması hedeflenen puan 35 olarak belirlenmiştir.
 
 ## Daily Scrum
 Proje sürecinde ekip üyeleri genellikle WhatsApp üzerinden günlük iletişim kurarak görevlerin ilerleyişi hakkında bilgi paylaştı.
