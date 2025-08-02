@@ -138,6 +138,7 @@ https://drive.google.com/drive/folders/1ISEpIOwXcuzbl3RS_DKlopBywuVwm0Eg?usp=sha
 - Dokümantasyonun güncel tutulması konusunda daha dikkatli olunmalı.
 
  # Sprint 3 Raporu  
+ 
 *Takım İsmi:* CVil Society  
 *Sprint Süresi:* 20.07.25 – 03.08.25  
 *Toplam Proje Puanı:* 100  
@@ -150,6 +151,7 @@ https://drive.google.com/drive/folders/1ISEpIOwXcuzbl3RS_DKlopBywuVwm0Eg?usp=sha
 Bu sprintte, sistemin *kararlı ve kullanıcıya hazır* bir sürümünün oluşturulması hedeflenmiştir. Önceki sprintlerde geliştirilen altyapılar sadeleştirilmiş ve sistemin uçtan uca çalıştığı bir yapıya ulaşılmıştır.
 
 *Öne çıkan geliştirmeler:*
+
 •⁠  ⁠PDF’ten metin çıkarma modülü son testlerden başarıyla geçti.  
 •⁠  ⁠Dil algılama özelliği Türkçe ve İngilizce için optimize edildi.  
 •⁠  ⁠Semantik benzerlik analizi ile sıfır-atış sınıflandırma birleştirildi ve entegre edildi.  
@@ -162,10 +164,12 @@ Bu sprint, toplam iş yükünün %45’ini kapsayacak şekilde planlanmış ve b
 ---
 
 ## Daily Scrum  
+
 *İletişim Kanalları:* WhatsApp, Trello, Google Meet  
 *Toplantı Saatleri:* 18:00 – 20:00  
 
 *Görüşülen başlıca konular:*
+
 •⁠  ⁠Son prototipin testleri ve hata kontrolü  
 •⁠  ⁠Semantik eşleşme ve sınıflandırma çıktılarının doğruluğu  
 •⁠  ⁠Anlamlı içerik kontrol fonksiyonunun son revizyonu  
@@ -177,7 +181,9 @@ Bu sprint, toplam iş yükünün %45’ini kapsayacak şekilde planlanmış ve b
 ---
 
 ## Sprint Board Updates  
+
 *Tamamlananlar:*
+
 •⁠  ⁠PDF to Text fonksiyonunun optimizasyonu  
 •⁠  ⁠Bölüm bazlı puanlama sistemi  
 •⁠  ⁠Semantik analiz ve sınıflandırma entegrasyonu  
@@ -186,6 +192,7 @@ Bu sprint, toplam iş yükünün %45’ini kapsayacak şekilde planlanmış ve b
 •⁠  ⁠JSON çıktı formatının sonlandırılması  
 
 *Devam Edenler:*
+
 •⁠  ⁠Web arayüzü ile analiz modülünün birleştirilmesi  
 •⁠  ⁠Proje sunumu ve dokümantasyonunun tamamlanması  
 
@@ -195,6 +202,7 @@ Bu sprint, toplam iş yükünün %45’ini kapsayacak şekilde planlanmış ve b
 Bu sprint sonunda, sistem artık *tamamen işlevsel ve kullanıcıya hazır* bir yapay zekâ destekli CV analiz aracı haline gelmiştir.  
 
 *Sistemin işleyiş adımları:*
+
 1.⁠ ⁠PDF’ten metin çıkarımı  
 2.⁠ ⁠Dil algılama (Türkçe/İngilizce)  
 3.⁠ ⁠CV bölümlerinin sınıflandırılması (semantik benzerlik + zero-shot learning)  
@@ -204,6 +212,7 @@ Bu sprint sonunda, sistem artık *tamamen işlevsel ve kullanıcıya hazır* bir
 7.⁠ ⁠Güçlü/zayıf yönlerin çıkarılması ve öneri sunumu  
 
 *Kullanılan teknolojiler:*
+
 •⁠  ⁠*PDF işleme:* pdfplumber  
 •⁠  ⁠*Dil algılama:* langdetect  
 •⁠  ⁠*NLP:* SentenceTransformer, MoritzLaurer/mDeBERTa-v3  
@@ -213,12 +222,15 @@ Bu sprint sonunda, sistem artık *tamamen işlevsel ve kullanıcıya hazır* bir
 ---
 
 ## Sprint Review  
+
 *Hedeflenenler:*
+
 •⁠  ⁠Kararlı ve sürdürülebilir bir sistem kurmak  
 •⁠  ⁠Geri bildirim mekanizmasını tamamlamak  
 •⁠  ⁠Kullanıcıya açık ve yönlendirici çıktılar sunmak  
 
 *Gerçekleşenler:*
+
 •⁠  ⁠Sistem kararlı bir şekilde çalışmaktadır  
 •⁠  ⁠Semantik analiz ve sınıflandırma başarıyla entegre edilmiştir  
 •⁠  ⁠JSON formatında detaylı analiz çıktısı oluşturulmuştur  
@@ -235,13 +247,16 @@ Bu sprint sonunda, sistem artık *tamamen işlevsel ve kullanıcıya hazır* bir
 ---
 
 ## Sprint Retrospective  
+
 ### İyi Olanlar:
+
 •⁠  ⁠Kod tabanı sadeleştirilerek modüler hale getirildi  
 •⁠  ⁠Puanlama ve içerik analizi algoritmaları başarıyla optimize edildi  
 •⁠  ⁠Dil bilgisi analizi ve geri bildirim yapısı tamamlandı  
 •⁠  ⁠Arayüz ve analiz modülü arasındaki bağlantı test edilerek doğrulandı  
 
 ### Geliştirilmesi Gerekenler:
+
 •⁠  ⁠NLP modelleri daha optimize versiyonlarla güncellenebilir  
 •⁠  ⁠Dokümantasyon ve sunum içerikleri daha da detaylandırılabilir  
 
