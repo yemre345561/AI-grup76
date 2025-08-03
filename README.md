@@ -181,6 +181,8 @@ Bu sprint, toplam iş yükünün %45’ini kapsayacak şekilde planlanmış ve b
 ---
 
 ## Sprint Board Updates  
+Aşağıdaki linkte  uygulamanın arayüz görüntülerine ve geliştirilen modelle ilgili görüntülere ulaşabilirsiniz.
+https://drive.google.com/drive/folders/1M7C7cEocheCuRENMb2cCmQu2upuz-AsM
 
 *Tamamlananlar:*
 
@@ -190,9 +192,6 @@ Bu sprint, toplam iş yükünün %45’ini kapsayacak şekilde planlanmış ve b
 •⁠  ⁠Dil algılama ve dil bilgisi kontrolü  
 •⁠  ⁠Güçlü/zayıf yön çıkarımı ve öneri listesi  
 •⁠  ⁠JSON çıktı formatının sonlandırılması  
-
-*Devam Edenler:*
-
 •⁠  ⁠Web arayüzü ile analiz modülünün birleştirilmesi  
 •⁠  ⁠Proje sunumu ve dokümantasyonunun tamamlanması  
 
