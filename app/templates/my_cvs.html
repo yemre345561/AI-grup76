@@ -29,17 +29,17 @@
                     </td>
                     <td>{{ cv.upload_date.strftime('%d/%m/%Y %H:%M') }}</td>
                     <td>
-                        <span class="badge bg-{{ 'success' if cv.analysis_result else 'secondary' }}">
-                            {{ 'Tamamlandı' if cv.analysis_result else 'Bekliyor' }}
+                        <span class="badge bg-{{ 'success' if cv.status == 'completed' else 'secondary' }}">
+                            {{ 'Tamamlandı' if cv.status == 'completed' else 'Bekliyor' }}
                         </span>
                     </td>
                     <td>
-                        {% if cv.score is defined and cv.score is not none %}
+                        {% if cv.status == 'completed' and cv.overall_score is not none %}
                         <div class="d-flex align-items-center">
-                            {% set score_percent = (cv.score * 100)|round|int %}
-                            {% if cv.score >= 0.7 %}
+                            {% set score_percent = (cv.overall_score)|round|int %}
+                            {% if cv.overall_score >= 70 %}
                                 {% set bar_class = 'bg-success' %}
-                            {% elif cv.score >= 0.5 %}
+                            {% elif cv.overall_score >= 50 %}
                                 {% set bar_class = 'bg-warning' %}
                             {% else %}
                                 {% set bar_class = 'bg-danger' %}
@@ -51,7 +51,6 @@
                                 </div>
                             </div>
                             <script>
-                                // Progress bar genişliğini ayarla
                                 document.addEventListener('DOMContentLoaded', function() {
                                     const progressBars = document.querySelectorAll('[data-width]');
                                     progressBars.forEach(bar => {
@@ -66,7 +65,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        {% if cv.analysis_result %}
+                        {% if cv.status == 'completed' %}
                         <a href="{{ url_for('views.cv_results', cv_id=cv.id) }}" class="btn btn-sm btn-outline-primary me-1" title="Görüntüle">
                             <i class="fas fa-eye"></i>
                         </a>
@@ -113,3 +112,4 @@
 {% endif %}
 
 {% endblock %}
+

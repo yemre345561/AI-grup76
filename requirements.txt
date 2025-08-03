@@ -14,3 +14,7 @@ python-dateutil>=2.8.2
 sqlalchemy>=1.4.0
 kombu>=5.2.0  # Celery için gerekli
 python-multipart>=0.0.5  # File uploadlar için
+pdfplumber
+langdetect
+sentence-transformers
+transformers

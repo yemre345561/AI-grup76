@@ -7,17 +7,21 @@
             <div class="card-header bg-white py-3">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="h5 mb-0">CV Analiz Sonuçları</h2>
-                    <span class="badge bg-{{ 'success' if cv.score >= 70 else 'warning' if cv.score >= 50 else 'danger' }} fs-6">
-                        Puan: {{ "%.1f"|format(cv.score) }}/100
+                    {% set score = cv.overall_score or 0 %}
+                    <span class="badge bg-{{ 'success' if score >= 70 else 'warning' if score >= 50 else 'danger' }} fs-6">
+                        Puan: {{ "%.1f"|format(score) }}/100
                     </span>
+                    
+                    
                 </div>
             </div>
             <div class="card-body">
                 <div class="row mb-4">
                     <div class="col-md-4 text-center mb-3 mb-md-0">
                         <div class="position-relative d-inline-block">
-                            <div class="progress-circle" data-value="{{ (cv.score/100)*360 }}">
-                                <span class="progress-circle-value">{{ "%.1f"|format(cv.score) }}%</span>
+                            <div class="progress-circle" data-value="{% if cv.overall_score is not none %}{{ (cv.overall_score / 100)*360 }}{% else %}0{% endif %}">
+
+                                <span class="progress-circle-value">{{ "%.1f"|format(cv.overall_score or 0) }}%</span>
                             </div>
                         </div>
                         <p class="mt-2 text-muted">Genel Puan</p>
@@ -37,72 +41,68 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-header bg-success text-white">
-                                <i class="fas fa-check-circle me-2"></i>Güçlü Yönleriniz
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <i class="fas fa-check text-success me-2"></i>İyi bir eğitim geçmişi
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-check text-success me-2"></i>İlgili iş deneyimi
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-check text-success me-2"></i>Güçlü teknik beceriler
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-4">
-                        <div class="card h-100 border-0 shadow-sm">
-                            <div class="card-header bg-warning text-dark">
-                                <i class="fas fa-exclamation-triangle me-2"></i>Geliştirilebilir Yönleriniz
-                            </div>
-                            <div class="card-body">
-                                <ul class="list-group list-group-flush">
-                                    <li class="list-group-item">
-                                        <i class="fas fa-exclamation text-warning me-2"></i>Yabancı dil seviyesi
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-exclamation text-warning me-2"></i>Sertifika sayısı
-                                    </li>
-                                    <li class="list-group-item">
-                                        <i class="fas fa-exclamation text-warning me-2"></i>Proje deneyimi
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- Güçlü yönler / geliştirilebilir yönler / öneriler kısmı burada olacak -->
+                <hr>
 
-                <div class="card border-0 shadow-sm mb-4">
-                    <div class="card-header bg-primary text-white">
-                        <i class="fas fa-lightbulb me-2"></i>Öneriler
-                    </div>
-                    <div class="card-body">
+                {% if analysis %}
+                    <!-- Güçlü Yönler -->
+                    {% if analysis.strengths %}
+                    <div class="mb-4">
+                        <h5><i class="fas fa-check-circle text-success me-2"></i>Güçlü Yönler</h5>
                         <ul class="list-group list-group-flush">
+                            {% for item in analysis.strengths %}
                             <li class="list-group-item">
-                                <i class="fas fa-arrow-right text-primary me-2"></i>
-                                İngilizce seviyenizi geliştirmek için online kurslara katılabilirsiniz.
+                                <i class="fas fa-check text-success me-2"></i>{{ item }}
                             </li>
-                            <li class="list-group-item">
-                                <i class="fas fa-arrow-right text-primary me-2"></i>
-                                Sektörel sertifika programlarına katılarak uzmanlığınızı artırabilirsiniz.
-                            </li>
-                            <li class="list-group-item">
-                                <i class="fas fa-arrow-right text-primary me-2"></i>
-                                Açık kaynak projelere katkıda bulunarak deneyim kazanabilirsiniz.
-                            </li>
+                            {% endfor %}
                         </ul>
                     </div>
-                </div>
+                    {% endif %}
+                
+                    <!-- Geliştirilebilir Yönler -->
+                    {% if analysis.weaknesses %}
+                    <div class="mb-4">
+                        <h5><i class="fas fa-exclamation-circle text-warning me-2"></i>Geliştirilebilir Yönler</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for item in analysis.weaknesses %}
+                            <li class="list-group-item">
+                                <i class="fas fa-exclamation text-warning me-2"></i>{{ item }}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                
+                    <!-- Öneriler -->
+                    {% if analysis.recommendations %}
+                    <div class="mb-4">
+                        <h5><i class="fas fa-lightbulb text-primary me-2"></i>Yapay Zeka Önerileri</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for rec in analysis.recommendations %}
+                            <li class="list-group-item">
+                                <i class="fas fa-lightbulb text-primary me-2"></i>{{ rec.message }}
+                                {% if rec.resources %}
+                                <div class="mt-2">
+                                    <small class="text-muted">Kaynaklar:</small>
+                                    <ul class="mb-0 ps-3">
+                                        {% for res in rec.resources %}
+                                        <li><a href="{{ res }}" target="_blank">{{ res }}</a></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                {% endif %}
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                {% endif %}
+            
 
-                <div class="d-flex justify-content-between">
+
+
+
+                <div class="d-flex justify-content-between mt-4">
                     <a href="{{ url_for('views.upload_cv') }}" class="btn btn-outline-primary">
                         <i class="fas fa-upload me-2"></i>Yeni CV Yükle
                     </a>
@@ -114,6 +114,8 @@
         </div>
     </div>
 </div>
+
+
 {% endblock %}
 
 {% block styles %}
@@ -177,7 +179,7 @@
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    
+
     .no-print {
         display: none !important;
     }
@@ -187,45 +189,37 @@
 
 {% block scripts %}
 <script>
-//<![CDATA[
-    document.addEventListener('DOMContentLoaded', function() {
-        try {
-            // Daire grafiğini oluştur
-            var cvScore = parseFloat('{{ cv.score|default(0) }}');
-            var degree = (cvScore / 100) * 360;
-            var progressCircle = document.querySelector('.progress-circle');
-            
-            if (!progressCircle) return;
-            
-            // Progress bar oluştur
-            var progressBar = document.createElement('div');
-            progressBar.className = 'progress-circle-fill';
-            
-            // Yarı daireleri oluştur
-            var leftHalf = document.createElement('div');
-            leftHalf.className = 'progress-circle-left';
-            
-            var rightHalf = document.createElement('div');
-            rightHalf.className = 'progress-circle-right';
-            
-            // Dönüş açılarını ayarla
-            if (degree <= 180) {
-                rightHalf.style.transform = 'rotate(' + degree + 'deg)';
-                leftHalf.style.display = 'none';
-            } else {
-                rightHalf.style.transform = 'rotate(180deg)';
-                leftHalf.style.transform = 'rotate(' + (degree - 180) + 'deg)';
-            }
-            
-            // Elementleri birleştir
-            progressBar.appendChild(rightHalf);
-            progressBar.appendChild(leftHalf);
-            progressCircle.insertBefore(progressBar, progressCircle.firstChild);
-            
-        } catch (error) {
-            console.error('Progress bar oluşturulurken hata oluştu:', error);
+document.addEventListener('DOMContentLoaded', function() {
+    try {
+        var cvScore = parseFloat('{{ cv.overall_score|default(0) }}');
+        var degree = (cvScore / 100) * 360;
+        var progressCircle = document.querySelector('.progress-circle');
+        if (!progressCircle) return;
+
+        var progressBar = document.createElement('div');
+        progressBar.className = 'progress-circle-fill';
+
+        var leftHalf = document.createElement('div');
+        leftHalf.className = 'progress-circle-left';
+
+        var rightHalf = document.createElement('div');
+        rightHalf.className = 'progress-circle-right';
+
+        if (degree <= 180) {
+            rightHalf.style.transform = 'rotate(' + degree + 'deg)';
+            leftHalf.style.display = 'none';
+        } else {
+            rightHalf.style.transform = 'rotate(180deg)';
+            leftHalf.style.transform = 'rotate(' + (degree - 180) + 'deg)';
         }
-    });
-//]]>
+
+        progressBar.appendChild(rightHalf);
+        progressBar.appendChild(leftHalf);
+        progressCircle.insertBefore(progressBar, progressCircle.firstChild);
+
+    } catch (error) {
+        console.error('Progress bar oluşturulurken hata oluştu:', error);
+    }
+});
 </script>
 {% endblock %}

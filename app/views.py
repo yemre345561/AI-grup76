@@ -13,14 +13,11 @@ from datetime import datetime
 import json
 import requests
 from sqlalchemy.exc import SQLAlchemyError
+from app.model_logic import analyze_cv  
+
 
 # Configuration
 ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
-DATA_SCIENCE_MODEL_URL = "http://localhost:8000/analyze"  # Veri bilimi ekibinin model URL'si
-
-def get_data_science_api_url():
-    from flask import current_app
-    return current_app.config.get('DATA_SCIENCE_API_URL', 'http://localhost:5001/api')
 
 # Helper Functions
 def allowed_file(filename):
@@ -63,7 +60,12 @@ def my_cvs():
 @login_required
 def cv_results(cv_id):
     cv = CV.query.filter_by(id=cv_id, user_id=current_user.id).first_or_404()
-    return render_template('cv_results.html', cv=cv)
+
+    analysis_data = cv.get_analysis()  
+
+    return render_template('cv_results.html', cv=cv, analysis=analysis_data)
+
+
 
 @views.route('/delete_account', methods=['POST'])
 @login_required
@@ -259,7 +261,6 @@ def upload_cv():
     if request.method == 'POST':
         print("Dosya yükleme isteği alındı")  # Debug
         
-        # Dosya kontrolü
         if 'file' not in request.files:
             print("Dosya bulunamadı")  # Debug
             flash('Lütfen bir dosya seçin', 'danger')
@@ -271,7 +272,6 @@ def upload_cv():
             flash('Lütfen geçerli bir dosya seçin', 'danger')
             return redirect(request.url)
         
-        # Dosya uzantısı kontrolü
         ALLOWED_EXTENSIONS = {'pdf', 'doc', 'docx'}
         file_ext = file.filename.rsplit('.', 1)[1].lower() if '.' in file.filename else ''
         if '.' not in file.filename or file_ext not in ALLOWED_EXTENSIONS:
@@ -280,20 +280,11 @@ def upload_cv():
             return redirect(request.url)
         
         try:
-            # Dosyayı kaydet
             filename = secure_filename(file.filename)
             upload_folder = os.path.join(current_app.static_folder, 'uploads')
-            
-            # Klasör yoksa oluştur
-            try:
-                os.makedirs(upload_folder, exist_ok=True)
-                print(f"Upload klasörü: {upload_folder}")  # Debug
-            except Exception as e:
-                print(f"Klasör oluşturma hatası: {str(e)}")  # Debug
-                flash('Dosya kaydedilemedi. Lütfen daha sonra tekrar deneyin.', 'danger')
-                return redirect(request.url)
-            
-            # Benzersiz dosya adı oluştur
+            os.makedirs(upload_folder, exist_ok=True)
+            print(f"Upload klasörü: {upload_folder}")  # Debug
+
             base, ext = os.path.splitext(filename)
             counter = 1
             while os.path.exists(os.path.join(upload_folder, filename)):
@@ -303,59 +294,68 @@ def upload_cv():
             filepath = os.path.join(upload_folder, filename)
             print(f"Dosya kaydediliyor: {filepath}")  # Debug
             
-            # Dosyayı kaydet
-            try:
-                file.save(filepath)
-                print("Dosya başarıyla kaydedildi")  # Debug
-            except Exception as e:
-                print(f"Dosya kaydetme hatası: {str(e)}")  # Debug
-                flash('Dosya kaydedilemedi. Lütfen tekrar deneyin.', 'danger')
-                return redirect(request.url)
-            
+            file.save(filepath)
+            print("Dosya başarıyla kaydedildi")  # Debug
+
             # CV kaydını oluştur
+            cv = CV(
+                original_filename=file.filename,
+                stored_filename=filename,
+                user_id=current_user.id,
+                status='pending',
+                created_at=datetime.utcnow()
+            )
+            db.session.add(cv)
+            db.session.commit()
+            print(f"CV kaydı oluşturuldu: {cv.id}")  # Debug
+
+            # AI analizini yap
             try:
-                cv = CV(
-                    original_filename=file.filename,
-                    stored_filename=filename,
-                    user_id=current_user.id,
-                    status='pending',
-                    created_at=datetime.utcnow()
-                )
-                db.session.add(cv)
+                from .model_logic import analyze_cv, extract_text_from_pdf
+                import json
+
+                # PDF'ten metni oku
+                cv_text = extract_text_from_pdf(filepath)
+
+                if cv_text.strip():
+                    result = analyze_cv(cv_text)
+
+                    score = result.get("score")
+                    if score is None:
+                        raise ValueError("Analiz sonucu geçersiz: score değeri yok")
+
+                    print(" Analiz sonucu:", result)
+                    print(" Toplam skor:", score)
+
+                    cv.analysis_data = json.dumps(result)
+                    cv.overall_score = score  
+                    cv.status = 'completed'
+                    cv.analysis_date = datetime.utcnow()
+                    db.session.commit()
+                    print("Analiz tamamlandı ve veritabanına kaydedildi.")
+                else:
+                    raise ValueError("CV metni boş")
+
+            except Exception as e:
+                print(f"Analiz hatası: {str(e)}")
+                cv.status = 'error'
+                cv.error_message = str(e)
                 db.session.commit()
-                print(f"CV kaydı oluşturuldu: {cv.id}")  # Debug
-            except Exception as e:
-                db.session.rollback()
-                print(f"Veritabanı hatası: {str(e)}")  # Debug
-                # Dosyayı sil
-                try:
-                    if os.path.exists(filepath):
-                        os.remove(filepath)
-                except:
-                    pass
-                flash('CV kaydı oluşturulamadı. Lütfen tekrar deneyin.', 'danger')
-                return redirect(request.url)
-            
-            # Analiz işlemini başlat (eğer varsa)
-            try:
-                from .tasks import analyze_cv_async
-                analyze_cv_async.delay(cv.id)
-                print("Analiz işlemi başlatıldı")  # Debug
-            except Exception as e:
-                print(f"Analiz başlatma hatası: {str(e)}")  # Debug
-                # Hata olsa bile devam et
-            
+
             flash('CV başarıyla yüklendi!', 'success')
             return redirect(url_for('views.my_cvs'))
-            
+        
         except Exception as e:
             print(f"Beklenmeyen hata: {str(e)}")  # Debug
             db.session.rollback()
             flash('Bir hata oluştu. Lütfen tekrar deneyin.', 'danger')
             return redirect(request.url)
+
     
-    # GET isteği için sayfayı göster
     return render_template('upload_cv.html')
+
+
+
 
 # Helper function to read CV file content
 def read_cv_file(file_path):
@@ -387,127 +387,124 @@ def read_cv_file(file_path):
         print(f"Error reading file {file_path}: {str(e)}")
         return ""
 
-def call_data_science_model(cv_data, model_endpoint):
-    """
-    Call data science model for CV analysis
-    """
-    try:
-        response = requests.post(
-            model_endpoint,
-            json={"text": cv_data},
-            timeout=30
-        )
-        response.raise_for_status()
-        return response.json()
-    except requests.exceptions.RequestException as e:
-        print(f"Error calling data science model: {str(e)}")
-        return None
 
+
+# analyze_cv_with_ai fonksiyonu
 def analyze_cv_with_ai(cv_text):
-    """
-    Analyze CV with AI model
-    """
     if not cv_text.strip():
-        return None
-        
-    # Call data science model
-    analysis = call_data_science_model(cv_text, DATA_SCIENCE_MODEL_URL)
+        return {}
+
+    analysis = analyze_cv(cv_text)
+
     
-    if not analysis:
-        # Fallback to simple analysis if model call fails
-        word_count = len(cv_text.split())
-        return {
-            'score': 50,  # Default score
-            'analysis': {
-                'summary': 'Temel analiz yapıldı',
-                'details': {
-                    'word_count': word_count,
-                    'sections_found': False
-                }
-            }
-        }
-    
+    analysis["full_text"] = "\n".join(analysis.get("strengths", [])) + "\n" + "\n".join(analysis.get("weaknesses", []))
+
     return analysis
 
-# API endpoint for CV analysis
+
+
+
 @views.route('/api/analyze/<int:cv_id>', methods=['POST'])
 def analyze_cv_api(cv_id):
     cv = CV.query.get_or_404(cv_id)
-    
+
     if cv.status == 'completed':
+        feedback = generate_feedback(cv)
+        print("FEEDBACK (already completed):", feedback)  
         return jsonify({
             'status': 'already_completed',
-            'analysis': json.loads(cv.analysis) if cv.analysis else None
+            'analysis': feedback
         })
-    
+
     try:
-        # Update status to processing
-        cv.status = 'processing'
-        db.session.commit()
-        
-        # Read CV file
+        # CV işleniyor...
         file_path = os.path.join(current_app.static_folder, 'uploads', cv.stored_filename)
         cv_text = read_cv_file(file_path)
-        
-        if not cv_text.strip():
-            raise ValueError("CV dosyası boş veya okunamadı")
-        
-        # Call data science model
-        analysis = call_data_science_model(cv_text, DATA_SCIENCE_MODEL_URL)
-        
-        if not analysis:
-            raise ValueError("Analiz sırasında bir hata oluştu")
-        
-        # Update CV with analysis results
-        cv.analysis = json.dumps(analysis)
+        analysis = analyze_cv_with_ai(cv_text)
+
+        # Veritabanına kaydet
+        cv.analysis_data = analysis
+        cv.overall_score = analysis.get("score", 0)
         cv.status = 'completed'
-        cv.analysis_date = datetime.utcnow()
-        
-        # Generate feedback
-        feedback = generate_feedback(cv)
-        if feedback:
-            cv.feedback = json.dumps(feedback)
-        
+        cv.updated_at = datetime.utcnow()
         db.session.commit()
-        
+
+        # Feedback üretimi ve loglanması
+        feedback = generate_feedback(cv)
+        print("FEEDBACK (fresh):", feedback)  
+
         return jsonify({
             'status': 'completed',
-            'analysis': analysis,
-            'feedback': feedback
+            'analysis': feedback
         })
-        
+
     except Exception as e:
         cv.status = 'error'
-        cv.error_message = str(e)
         db.session.commit()
-        
         return jsonify({
             'status': 'error',
             'error': str(e)
         }), 500
 
+
+
 def generate_feedback(cv):
-    """Generate user-friendly feedback from analysis"""
-    analysis = json.loads(cv.analysis)
-    
+    import json
+    from flask import current_app
+    import os
+
+    print(" generate_feedback çağrıldı")
+    print("cv.analysis_data:", cv.analysis_data)
+
+    if not cv.analysis_data:
+        print(" cv.analysis_data None veya boş!")
+        return {
+            'score': 0,
+            'status': cv.status,
+            'sections': {},
+            'strengths': [],
+            'weaknesses': [],
+            'recommendations': []
+        }
+
+    try:
+        analysis = json.loads(cv.analysis_data) if isinstance(cv.analysis_data, str) else cv.analysis_data
+        if analysis is None:
+            raise ValueError("analysis None geldi!")
+    except Exception as e:
+        print(" JSON parse hatası:", e)
+        return {
+            'score': 0,
+            'status': cv.status,
+            'sections': {},
+            'strengths': [],
+            'weaknesses': [],
+            'recommendations': []
+        }
+
+    # CV dosyasını oku
+    file_path = os.path.join(current_app.static_folder, 'uploads', cv.stored_filename)
+    cv_text = read_cv_file(file_path)
+
+    # Artık analysis üzerinden öneri üret
+    recommendations_raw = []  
+    print(" Raw Öneriler:", recommendations_raw)
+
     feedback = {
         'score': analysis.get('score', 0),
         'status': cv.status,
         'sections': {},
-        'recommendations': []
+        'strengths': analysis.get('strengths', []),
+        'weaknesses': analysis.get('weaknesses', []),
+        'recommendations': recommendations_raw
     }
-    
-    # Add section-specific feedback
-    for section, score in (analysis.get('section_scores', {}) or {}).items():
-        feedback['sections'][section] = {
-            'score': score,
-            'feedback': get_section_feedback(section, score, analysis)
-        }
-    
-    # Add overall recommendations
-    feedback['recommendations'] = generate_recommendations(analysis)
-    
+
+    print(" FEEDBACK üretildi:", feedback)
     return feedback
+
+
+
+
 
 def get_section_feedback(section, score, analysis):
     """Generate feedback for a specific section"""
