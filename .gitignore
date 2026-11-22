@@ -1,0 +1,14 @@
+# Local secrets
+.env
+
+# Uploaded CV files (personal data)
+app/static/uploads/
+
+# Local SQLite databases
+*.db
+
+# Python bytecode
+__pycache__/
+
+# PyCharm
+.idea/

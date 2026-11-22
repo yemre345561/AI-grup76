@@ -1,268 +1,71 @@
-# Sprint 1 Raporu
+# AI Resume Evaluator
 
-## Takım İsmi
-*CVil Society*
+Team project by **CVil Society**, built during Yapay Zeka ve Teknoloji Akademisi (the name is in the site footer). Four teammates recorded the work in three Scrum sprints and used Jira for the backlog. The original Turkish sprint reports are in [docs/sprint-reports.md](docs/sprint-reports.md).
 
-## Product Backlog
-👉 https://ai-grup76-yzt.atlassian.net/jira/core/projects/RE/board?groupBy=status
----
+This README describes the code in the repository today.
 
-## Sprint Planlaması
+## What it does
 
-- *Sprint İçinde Tamamlanması Tahmin Edilen Puan:* 20  
-- *Toplam Proje Puanı:* 100  
-- *Tahmin Mantığı:*  
-  Proje toplamda 100 puan üzerinden planlanmıştır. 3 sprint boyunca farklı ağırlıklarla ilerlenmesi hedeflenmektedir. Bu ilk sprintte temel altyapıya odaklanılmıştır.
+A user can sign up, log in, upload a CV, and reopen a saved result. The upload form accepts PDF, DOC, and DOCX. The upload route in `app/views.py` then always calls `extract_text_from_pdf` in `app/model_logic.py`, which reads PDFs with pdfplumber. A Word file is saved, and that extraction step fails on it.
 
----
+`read_cv_file` in `app/views.py` can read a PDF with PyPDF2 and a DOCX with python-docx. `POST /api/analyze/<cv_id>` is the route that uses it. The upload page leaves that helper unused.
 
-## Daily Scrum Bilgileri
+When extraction returns text, `analyze_cv` does the following:
 
-- *İletişim Kanalları:* WhatsApp, Trello, Slack  
-- *Toplantı Zamanı:* Genellikle her gün akşam 20:00 - 21:00  
-- *Görüşülen Konular:*
-  - Proje fikrinin son haliyle netleştirilmesi
-  - Arayüzde PDF yükleme modülü hakkında fikir alışverişi
-  - NLP modülünde kullanılacak kütüphanelerin belirlenmesi
+1. Detect the language with langdetect. A result of `en` is labeled English, and the grammar check uses LanguageTool `en-US`. Every other language code is labeled Türkçe, and the grammar check uses LanguageTool `tr`.
+2. Score ten CV sections. For each section the code tries, in order, a meaningful-content check (full credit), a heading-text match (score 0.4), cosine similarity with `SentenceTransformer('all-MiniLM-L6-v2')`, and zero-shot classification with `MoritzLaurer/mDeBERTa-v3-base-mnli-xnli`. The similarity step runs when the score is still below 0.4 and keeps a similarity above 0.4. The zero-shot step runs only if the score is still below 0.4.
+3. Multiply each section score by a fixed weight and sum them. The weights are experience 25, education 15, skills 15, summary 10, leadership 10, certificates 10, contact 5, portfolio 5, languages 3, and references 2 (100 in total). If no section has meaningful content, the total is set to 0.
+4. Run a grammar check on the first 5,000 characters with `language_tool_python`.
+5. Add rule-based recommendations when the text does not mention Python, GitHub or GitLab, a project, or English.
 
----
+The function return value includes the score, strengths, weaknesses, grammar notes, and recommendations. The results page shows the score, strengths, weaknesses, and recommendation text. It leaves the grammar notes unrendered.
 
-## Sprint Board Durumu
+The routed pages are server-rendered Flask templates: home, login, sign-up, upload, results, saved CVs, and profile. Accounts live in SQLite. Passwords are hashed with Werkzeug (`pbkdf2:sha256`) and sessions use Flask-Login.
 
-### ✅ Tamamlananlar
-- Proje fikrinin belirlenmesi  
-- Veri seti seçimi  
-- Kullanılacak teknolojilerin belirlenmesi  
+## Team
 
-### 🚧 Üzerinde Çalışılanlar
-- PDF / Metin yükleme modülünün geliştirilmesi  
-- CV'den metin çıkarımı ve Named Entity Recognition (NER) işlemleri  
+| Name | GitHub |
+|------|--------|
+| Yunus Emre Açıkoğlu | [yemre345561](https://github.com/yemre345561) |
+| Meriç Özcan | [mericozcann](https://github.com/mericozcann) |
+| Tuana Korkmazyürek | [tuana0](https://github.com/tuana0) |
+| Edanur Tekçe | [edax-1](https://github.com/edax-1) |
 
----
+These four accounts are the GitHub contributors on this repository. A local `git shortlog` splits some of them across display names, so those counts are a poor measure of who did what. The sprint reports list all four as active through Sprint 3 (20 July 2025 to 3 August 2025).
 
-## Ürün Durumu
+## Tech stack
 
-- Arayüz taslağı çizildi  
-- PDF yükleme modülünün ilk prototipi oluşturuldu  
-
----
+- Backend: Flask, Flask-SQLAlchemy, Flask-Login, Flask-WTF, Flask-Migrate
+- Parsing and NLP: pdfplumber, PyPDF2, python-docx, langdetect, sentence-transformers, Hugging Face transformers, language_tool_python
+- Background jobs: Celery is initialized in `app/tasks.py`. The broker is `sqla+sqlite:///celery.db` and the result backend is `db+sqlite:///celery_results.db`. `analyze_cv_async` has no callers. The upload route runs the analysis inside the request.
+- Database: SQLite by default (`sqlite:///cv_analyzer.db`, which Flask-SQLAlchemy places in `instance/`). `DATABASE_URL` overrides that URI.
 
-## Sprint Review
+`app/__init__.py` imports `google.generativeai` on startup and calls `genai.configure` when `GOOGLE_API_KEY` is set. `analyze_cv` does not call Gemini.
 
-- *Proje Fikri:*  
-  Kullanıcının yüklediği CV'yi analiz ederek güçlü/zayıf yönlerini çıkaran bir AI sistemi geliştirilecek.
+## How to run
 
-- *Veri Seti:*  
-  Open Source Resume Dataset seçildi ve ön incelemesi yapıldı.
+```bash
+git clone https://github.com/yemre345561/AI-grup76.git
+cd AI-grup76
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python run.py
+```
 
-- *Teknoloji ve Yöntemler:*  
-  - Doğal Dil İşleme (NLP)  
-  - Named Entity Recognition (NER)  
-  - TF-IDF  
-  - Flask ve Streamlit alternatifleri değerlendirildi
+Then open http://127.0.0.1:5000 and create an account.
 
-- *Modül Geliştirmeleri:*  
-  PDF to Text dönüştürme modülünün geliştirilmesine başlandı.
+`app/views.py` imports `app/model_logic.py` at startup. That import builds `SentenceTransformer('all-MiniLM-L6-v2')` and the zero-shot pipeline, so the first launch downloads those weights and can take a while. The first grammar check can also download LanguageTool data.
 
----
+`run.py` starts the app in debug mode on `0.0.0.0:5000` and creates the SQLite tables if they do not exist. `main.py` is leftover PyCharm boilerplate and is not the entry point.
 
-## Sprint Katılımcıları
+Copy `.env.example` to `.env` for local settings. The app reads `FLASK_ENV`, `SECRET_KEY`, `DATABASE_URL`, `DATA_SCIENCE_API_URL`, and `GOOGLE_API_KEY`. `DATA_SCIENCE_API_URL` is stored on the config object and no route calls it. `FLASK_APP`, `MAX_CONTENT_LENGTH`, and `REDIS_URL` were names in the old env file; the application code does not read them (`MAX_CONTENT_LENGTH` is hardcoded at 16 MB). Do not commit `.env`.
 
-- Tuana Korkmazyürek - Aktif
-- Edanur Tekçe -  Aktif
-- Yunus Emre Açıkoğlu - Aktif
-- Meriç Özcan - Aktif
+## Project status
 
----
+This is an academic prototype from a fixed sprint cycle, not a production service. Known gaps:
 
-## Sprint Retrospective
-
-### ✅ İyi Olanlar
-- Proje fikri çok kısa sürede netleştirildi.  
-- İletişim verimli geçti, herkes sorumluluğunu aldı.  
-- Veri seti uygun bulundu ve hızlıca indirildi.
-
-### ⚠ Geliştirilmesi Gerekenler
-- Final haftası ve staj başlangıcı nedeniyle kod geliştirme kısmı yetersiz kaldı.  
-- Arayüz tasarımı konusunda görüş farklılıkları zaman kaybettirdi.  
-- Zaman yönetimi için bir sonraki sprintte daha net görev dağılımı yapılacak.
-
-# Sprint 2 Raporu
-
-## Sprint Notları
-Karar verilen proje için uygun veri setleri bulundu.Toplanılan verilerle model geliştirilmeye başlandı.Web uygulamasının arayüz kodları yazılmaya başlandı. 
-
-## Tahmin Edilen Tamamlanacak Puan
-Toplam proje iş yükü 100 puan olarak planlanmıştır.İkinci sprintte veri setlerinin toplanması model geliştirmeye başlanması ve web uygulamasının arayüz tasarımının oluşturulması hedeflenmiştir.Bu işler toplam projenin yaklaşık %35’ini kapsadığından bu sprintte tamamlanması hedeflenen puan 35 olarak belirlenmiştir.
-
-## Daily Scrum
-Proje sürecinde ekip üyeleri genellikle WhatsApp üzerinden günlük iletişim kurarak görevlerin ilerleyişi hakkında bilgi paylaştı.
-İhtiyaç halinde Google Meet üzerinden çevrim içi toplantılar yapıldı. Bu toplantılarda tamamlanan işler karşılaşılan problemler ve bir sonraki adımlar değerlendirildi.
-Toplantılar genellikle 18.00 ile 20.00 arasında gerçekleştirildi.
-Toplantılarla alakalı ekran görüntüleri bir sonraki bölümde bulunan linke eklenmiştir. 
-
-## Sprint Board Updates
-Aşağıdaki linkte uygulamanın arayüz görüntülerine ve geliştirilen modelle ilgili görüntülere ulaşabilirsiniz.
-https://drive.google.com/drive/folders/1ISEpIOwXcuzbl3RS_DKlopBywuVwm0Eg?usp=sharing
-
-## Sprint Review
-- Proje için kullanılacak uygun veri setleri araştırıldı ve seçildi.
-- Seçilen veri setleri başarıyla toplandı ve ön işleme (temizleme ve dönüştürme) süreci başlatıldı.
-- Model denemeleri yapılarak algoritma test edildi.
-- Web uygulaması için arayüz tasarımı yapıldı.
-- Backend ve frontend arasındaki temel bağlantı yapısı planlandı.
-- Takım içi görev dağılımı netleştirildi ve günlük ilerleme takibi yapıldı.
-- Gelecek geliştirmeler planlandı. Planlanan geliştirmeler aşağıda madde madde yer almaktadır
-- 1. Flask/FastAPI Web API entegrasyonu
-- 2. CV yüklenip JSON raporu alınabilecek web servisi.
-- 3. İmla ve dil bilgisi kontrolü (Java 17 ile LanguageTool).
-- 4. Derin öğrenme tabanlı bölüm ayıklama (BERT fine-tune).
-- 5. Web arayüzü (React + backend API).
-- 6. Puanlama optimizasyonu için ML modeli (örneğin iyi CV örnekleriyle eğitilmiş bir regresyon veya sınıflandırma modeli).
-
-## Sprint Katılımcıları
-- Edanur Tekçe(Aktif)
-- Meriç Özcan(Aktif)
-- Tuana Korkmazyürek(Aktif)
-- Yunus Emre Açıkoğlu(Aktif)
-
-## Sprint Retrospective
-## İyi Olanlar:
-- Uygun ve kaliteli veri setleri zamanında bulundu.
-- Model geliştirme sürecine planlandığı gibi başlandı.
-- Web uygulaması için arayüz kodlamasına başlanarak ön yüz tasarımı yapıldı.
-- Ekip içi iletişim ve görev paylaşımı uyumlu şekilde ilerledi.
-## Geliştirilmesi Gerekenler:
-- Model eğitimi sırasında yaşanan bazı teknik sorunlar çözüm sürecini yavaşlattı.
-- Geliştirilen modüllerin entegrasyonu için daha erken testler yapılmalı.
-- Dokümantasyonun güncel tutulması konusunda daha dikkatli olunmalı.
-
- # Sprint 3 Raporu  
- 
-*Takım İsmi:* CVil Society  
-*Sprint Süresi:* 20.07.25 – 03.08.25  
-*Toplam Proje Puanı:* 100  
-*Sprintte Tamamlanması Hedeflenen Puan:* 45  
-*Sprintte Gerçekleşen Puan:* 45  
-
----
-
-## Sprint Notları  
-Bu sprintte, sistemin *kararlı ve kullanıcıya hazır* bir sürümünün oluşturulması hedeflenmiştir. Önceki sprintlerde geliştirilen altyapılar sadeleştirilmiş ve sistemin uçtan uca çalıştığı bir yapıya ulaşılmıştır.
-
-*Öne çıkan geliştirmeler:*
-
-•⁠  ⁠PDF’ten metin çıkarma modülü son testlerden başarıyla geçti.  
-•⁠  ⁠Dil algılama özelliği Türkçe ve İngilizce için optimize edildi.  
-•⁠  ⁠Semantik benzerlik analizi ile sıfır-atış sınıflandırma birleştirildi ve entegre edildi.  
-•⁠  ⁠Bölüm ağırlıklandırma ve puanlama mantığı finalize edildi.  
-•⁠  ⁠Dil bilgisi ve yazım kontrolü fonksiyonel hale getirildi.  
-•⁠  ⁠Kullanıcıya puan, güçlü/zayıf yönler ve öneriler sunan çıktı sistemi tamamlandı.  
-
-Bu sprint, toplam iş yükünün %45’ini kapsayacak şekilde planlanmış ve başarıyla tamamlanmıştır.
-
----
-
-## Daily Scrum  
-
-*İletişim Kanalları:* WhatsApp, Trello, Google Meet  
-*Toplantı Saatleri:* 18:00 – 20:00  
-
-*Görüşülen başlıca konular:*
-
-•⁠  ⁠Son prototipin testleri ve hata kontrolü  
-•⁠  ⁠Semantik eşleşme ve sınıflandırma çıktılarının doğruluğu  
-•⁠  ⁠Anlamlı içerik kontrol fonksiyonunun son revizyonu  
-•⁠  ⁠Dil bilgisi analizinde tespit edilen eksiklerin giderilmesi  
-•⁠  ⁠JSON çıktı yapısının test edilmesi  
-•⁠  ⁠Web arayüzü ile analiz modülünün entegrasyon planı  
-•⁠  ⁠Proje sunumu için metinlerin ve videonun hazırlanması  
-
----
-
-## Sprint Board Updates  
-Aşağıdaki linkte  uygulamanın arayüz görüntülerine ve geliştirilen modelle ilgili görüntülere ulaşabilirsiniz.
-https://drive.google.com/drive/folders/1M7C7cEocheCuRENMb2cCmQu2upuz-AsM
-
-*Tamamlananlar:*
-
-•⁠  ⁠PDF to Text fonksiyonunun optimizasyonu  
-•⁠  ⁠Bölüm bazlı puanlama sistemi  
-•⁠  ⁠Semantik analiz ve sınıflandırma entegrasyonu  
-•⁠  ⁠Dil algılama ve dil bilgisi kontrolü  
-•⁠  ⁠Güçlü/zayıf yön çıkarımı ve öneri listesi  
-•⁠  ⁠JSON çıktı formatının sonlandırılması  
-•⁠  ⁠Web arayüzü ile analiz modülünün birleştirilmesi  
-•⁠  ⁠Proje sunumu ve dokümantasyonunun tamamlanması  
-
----
-
-## Ürün Durumu ve Teknik Gelişmeler  
-Bu sprint sonunda, sistem artık *tamamen işlevsel ve kullanıcıya hazır* bir yapay zekâ destekli CV analiz aracı haline gelmiştir.  
-
-*Sistemin işleyiş adımları:*
-
-1.⁠ ⁠PDF’ten metin çıkarımı  
-2.⁠ ⁠Dil algılama (Türkçe/İngilizce)  
-3.⁠ ⁠CV bölümlerinin sınıflandırılması (semantik benzerlik + zero-shot learning)  
-4.⁠ ⁠Anlamlı içerik kontrolü  
-5.⁠ ⁠Ağırlıklı puanlama  
-6.⁠ ⁠Dil bilgisi denetimi  
-7.⁠ ⁠Güçlü/zayıf yönlerin çıkarılması ve öneri sunumu  
-
-*Kullanılan teknolojiler:*
-
-•⁠  ⁠*PDF işleme:* pdfplumber  
-•⁠  ⁠*Dil algılama:* langdetect  
-•⁠  ⁠*NLP:* SentenceTransformer, MoritzLaurer/mDeBERTa-v3  
-•⁠  ⁠*Dil bilgisi denetimi:* language_tool_python  
-•⁠  ⁠*Kod yapısı:* Modüler, sadeleştirilmiş ve yorumlanabilir fonksiyonlar  
-
----
-
-## Sprint Review  
-
-*Hedeflenenler:*
-
-•⁠  ⁠Kararlı ve sürdürülebilir bir sistem kurmak  
-•⁠  ⁠Geri bildirim mekanizmasını tamamlamak  
-•⁠  ⁠Kullanıcıya açık ve yönlendirici çıktılar sunmak  
-
-*Gerçekleşenler:*
-
-•⁠  ⁠Sistem kararlı bir şekilde çalışmaktadır  
-•⁠  ⁠Semantik analiz ve sınıflandırma başarıyla entegre edilmiştir  
-•⁠  ⁠JSON formatında detaylı analiz çıktısı oluşturulmuştur  
-•⁠  ⁠Teknik sunum dokümanları ve tanıtım videosu hazırlanmıştır  
-
----
-
-## Sprint Katılımcıları  
-•⁠  ⁠Edanur Tekçe (Aktif)  
-•⁠  ⁠Tuana Korkmazyürek (Aktif)  
-•⁠  ⁠Meriç Özcan (Aktif)  
-•⁠  ⁠Yunus Emre Açıkoğlu (Aktif)  
-
----
-
-## Sprint Retrospective  
-
-### İyi Olanlar:
-
-•⁠  ⁠Kod tabanı sadeleştirilerek modüler hale getirildi  
-•⁠  ⁠Puanlama ve içerik analizi algoritmaları başarıyla optimize edildi  
-•⁠  ⁠Dil bilgisi analizi ve geri bildirim yapısı tamamlandı  
-•⁠  ⁠Arayüz ve analiz modülü arasındaki bağlantı test edilerek doğrulandı  
-
-### Geliştirilmesi Gerekenler:
-
-•⁠  ⁠NLP modelleri daha optimize versiyonlarla güncellenebilir  
-•⁠  ⁠Dokümantasyon ve sunum içerikleri daha da detaylandırılabilir  
-
----
-
-## Sonuç  
-Proje, Sprint 3 sonunda semantik analize dayalı, dil bağımsız ve uçtan uca çalışan bir CV analiz sistemine dönüşmüştür. Sistem; içerik değerlendirmesi, dil bilgisi kontrolü ve geliştirme önerileri sunarak yayına hazır hâle getirilmiştir.
-
-
-
+- Some packages in `requirements.txt` are pinned and some are not.
+- CSRF protection is turned off for every config (`WTF_CSRF_ENABLED = False` in `app/__init__.py`).
+- `main.py` is unused. `model_logic.py` at the repo root matches `app/model_logic.py` aside from line endings and trailing blank lines. `app/templates/index.html` has no route.
+- Uploaded CVs, local SQLite files, and `.env` are listed in `.gitignore` and are absent from the current tree. Older commits were left unchanged, so a full history checkout can still contain them.
